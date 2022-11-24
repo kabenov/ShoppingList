@@ -4,7 +4,7 @@ interface ShopListRepository {
 
     fun getShopItemList(): List<ShopItem>
 
-    fun getShopItem(id: Int): ShopItem
+    fun getShopItem(shopItemId: Int): ShopItem
 
     fun addShopItem(shopItem: ShopItem)
 
