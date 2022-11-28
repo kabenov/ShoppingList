@@ -3,6 +3,7 @@ package kz.example.shoppinglist.presentation
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kz.example.shoppinglist.R
 import kz.example.shoppinglist.domain.ShopItem
@@ -14,15 +15,16 @@ class ShopListAdapter: RecyclerView.Adapter<ShopItemViewHolder>() {
 
     var shopList = listOf<ShopItem>()
         set(value) {
+            val shopListDiffCallback = ShopListDiffCallback(shopList, value)
+            val diffResult = DiffUtil.calculateDiff(shopListDiffCallback)
+            diffResult.dispatchUpdatesTo(this)
             field = value
-            notifyDataSetChanged()
         }
 
     var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
     var onShopItemClickListener: ((ShopItem) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
-        Log.d("ShopListAdapter", "onCreateViewHolder ${++tempCount}")
         val layout = when(viewType) {
             SHOP_ITEM_ENABLED -> R.layout.shop_item_enabled
             SHOP_ITEM_DISABLED -> R.layout.shop_item_disabled
@@ -33,6 +35,7 @@ class ShopListAdapter: RecyclerView.Adapter<ShopItemViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
+        Log.d("ShopListAdapter", "onBindViewHolder ${++tempCount}")
         val shopItem = shopList[position]
         holder.itemName.text = shopItem.name
         holder.itemCount.text = shopItem.count.toString()
