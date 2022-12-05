@@ -1,7 +1,5 @@
 package kz.example.shoppinglist.presentation
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,10 +14,7 @@ import com.google.android.material.textfield.TextInputLayout
 import kz.example.shoppinglist.R
 import kz.example.shoppinglist.domain.ShopItem
 
-class ShopItemFragment(
-    private val screenMode: String = MODE_UNKNOWN,
-    private val shopItemId: Int = ShopItem.UNDEFINED_ID
-): Fragment() {
+class ShopItemFragment: Fragment() {
 
     //initialize on onBind()
     private lateinit var shopItemViewModel: ShopItemViewModel
@@ -31,6 +26,14 @@ class ShopItemFragment(
     private lateinit var editTextCount: EditText
     private lateinit var saveButton: Button
 
+    //initialize on
+    private var screenMode: String = MODE_UNKNOWN
+    private var shopItemId: Int = ShopItem.UNDEFINED_ID
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parseArgs()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +46,6 @@ class ShopItemFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        parseParams()
         onBind(view)
 
         launchRightMode()
@@ -123,12 +125,24 @@ class ShopItemFragment(
         })
     }
 
-    private fun parseParams() {
-        if(screenMode != MODE_ADD && screenMode != MODE_EDIT){
-            throw RuntimeException("Unknown screen mode $screenMode")
+    private fun parseArgs() {
+        val args = requireArguments()
+
+        if (!args.containsKey(SCREEN_MODE)) {
+            throw java.lang.RuntimeException("Screen mode is absent")
         }
-        if(screenMode == MODE_EDIT && shopItemId == ShopItem.UNDEFINED_ID) {
-            throw RuntimeException("Shop item id is absent")
+
+        val mode = args.getString(SCREEN_MODE)
+        if (mode != MODE_ADD && mode != MODE_EDIT) {
+            throw java.lang.RuntimeException("Unknown screen mode $mode")
+        }
+
+        screenMode = mode
+        if (screenMode == MODE_EDIT) {
+            if (!args.containsKey(SHOP_ITEM_ID)) {
+                throw java.lang.RuntimeException("Shop item id is absent")
+            }
+            shopItemId = args.getInt(SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
         }
     }
 
@@ -152,31 +166,27 @@ class ShopItemFragment(
 
 
     companion object {
-        private const val SCREEN_MODE = "extra_mode"
+        private const val SCREEN_MODE = "screen_mode"
         private const val MODE_UNKNOWN = ""
         private const val MODE_ADD = "mode_add"
         private const val MODE_EDIT = "mode_edit"
-        private const val SHOP_ITEM_ID = "extra_shop_item_id"
+        private const val SHOP_ITEM_ID = "shop_item_id"
 
-        fun getNewInstanceAddModeShopItemFragment(): ShopItemFragment {
-            return ShopItemFragment(MODE_ADD)
+        fun getNewInstanceAddMode(): ShopItemFragment {
+            return ShopItemFragment().apply {
+                arguments = Bundle().apply {
+                    putString(SCREEN_MODE, MODE_ADD)
+                }
+            }
         }
 
-        fun getNewInstanceEditModeShopItemFragment(shopItemId: Int): ShopItemFragment {
-            return ShopItemFragment(MODE_EDIT, shopItemId)
-        }
-
-        fun getNewIntentAddMode(context: Context): Intent {
-            val intent = Intent(context, ShopItemActivity::class.java)
-            intent.putExtra(SCREEN_MODE, MODE_ADD)
-            return intent
-        }
-
-        fun getNewIntentEditMode(context: Context, editedShopItemId: Int): Intent {
-            val intent = Intent(context, ShopItemActivity::class.java)
-            intent.putExtra(SCREEN_MODE, MODE_EDIT)
-            intent.putExtra(SHOP_ITEM_ID, editedShopItemId)
-            return intent
+        fun getNewInstanceEditMode(shopItemId: Int): ShopItemFragment {
+            return ShopItemFragment().apply {
+                arguments = Bundle().apply {
+                    putString(SCREEN_MODE, MODE_EDIT)
+                    putInt(SHOP_ITEM_ID, shopItemId)
+                }
+            }
         }
     }
 }

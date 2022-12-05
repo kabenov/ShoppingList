@@ -4,12 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputLayout
 import kz.example.shoppinglist.R
 import kz.example.shoppinglist.domain.ShopItem
 import java.lang.RuntimeException
@@ -31,8 +25,8 @@ class ShopItemActivity : AppCompatActivity() {
 
     private fun launchRightMode() {
         val shopItemFragment = when (extraScreenMode) {
-            EXTRA_MODE_ADD  -> ShopItemFragment.getNewInstanceAddModeShopItemFragment()
-            EXTRA_MODE_EDIT -> ShopItemFragment.getNewInstanceEditModeShopItemFragment(extraShopItemId)
+            EXTRA_MODE_ADD  -> ShopItemFragment.getNewInstanceAddMode()
+            EXTRA_MODE_EDIT -> ShopItemFragment.getNewInstanceEditMode(extraShopItemId)
             else            -> throw RuntimeException("Unknown screen mode $extraScreenMode")
         }
 
@@ -62,11 +56,11 @@ class ShopItemActivity : AppCompatActivity() {
 
 
     companion object {
-        private const val EXTRA_SCREEN_MODE = "extra_mode"
+        private const val EXTRA_SCREEN_MODE = "screen_mode"
         private const val EXTRA_MODE_UNKNOWN = ""
         private const val EXTRA_MODE_ADD = "mode_add"
         private const val EXTRA_MODE_EDIT = "mode_edit"
-        private const val EXTRA_SHOP_ITEM_ID = "extra_shop_item_id"
+        private const val EXTRA_SHOP_ITEM_ID = "shop_item_id"
 
         fun getNewIntentAddMode(context: Context): Intent {
             val intent = Intent(context, ShopItemActivity::class.java)
