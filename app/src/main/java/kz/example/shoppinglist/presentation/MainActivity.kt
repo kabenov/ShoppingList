@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupShopItemClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            Log.d("ShopItemClick", it.toString())
             val intent = ShopItemActivity.getNewIntentEditMode(this, it.id)
             startActivity(intent)
         }
