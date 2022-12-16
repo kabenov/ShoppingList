@@ -4,11 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import kz.example.shoppinglist.R
 import kz.example.shoppinglist.domain.ShopItem
 import java.lang.RuntimeException
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     //initialise on parseIntent()
     private var extraScreenMode = EXTRA_MODE_UNKNOWN
@@ -20,7 +21,10 @@ class ShopItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_shop_item)
 
         parseIntent()
-        launchRightMode()
+
+        if (savedInstanceState == null) {
+            launchRightMode()
+        }
     }
 
     private fun launchRightMode() {
@@ -31,7 +35,7 @@ class ShopItemActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.shop_item_container, shopItemFragment)
+            .replace(R.id.shop_item_container, shopItemFragment)
             .commit()
     }
 
@@ -54,6 +58,10 @@ class ShopItemActivity : AppCompatActivity() {
         }
     }
 
+    override fun onEditingFinished() {
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+        finish()
+    }
 
     companion object {
         private const val EXTRA_SCREEN_MODE = "screen_mode"

@@ -1,5 +1,6 @@
 package kz.example.shoppinglist.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,8 +14,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import kz.example.shoppinglist.R
 import kz.example.shoppinglist.domain.ShopItem
+import java.lang.RuntimeException
 
 class ShopItemFragment: Fragment() {
+
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     //initialize on onBind()
     private lateinit var shopItemViewModel: ShopItemViewModel
@@ -51,6 +55,17 @@ class ShopItemFragment: Fragment() {
         launchRightMode()
         errorForTextInputLayout()
         closeScreen()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is OnEditingFinishedListener) {
+            onEditingFinishedListener = context
+        }
+        else {
+            throw RuntimeException("Activity must implement OnEditingFinishedListener")
+        }
     }
 
     private fun launchRightMode() {
@@ -163,6 +178,10 @@ class ShopItemFragment: Fragment() {
     }
 
 
+    interface OnEditingFinishedListener {
+
+        fun onEditingFinished()
+    }
 
 
     companion object {

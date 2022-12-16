@@ -1,23 +1,28 @@
 package kz.example.shoppinglist.presentation
 
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kz.example.shoppinglist.R
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var shopListRecyclerView: RecyclerView
     private lateinit var shopListAdapter: ShopListAdapter
 
+    private var shopItemContainer: FragmentContainerView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        shopItemContainer = findViewById(R.id.shop_item_container)
 
         setupRecyclerView()
 
@@ -28,8 +33,14 @@ class MainActivity : AppCompatActivity() {
 
         val floatAddItemButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
         floatAddItemButton.setOnClickListener {
-            val intent = ShopItemActivity.getNewIntentAddMode(this)
-            startActivity(intent)
+            if (isPortraitMode()) {
+                val intent = ShopItemActivity.getNewIntentAddMode(this)
+                startActivity(intent)
+            }
+            else {
+                val shopItemFragment = ShopItemFragment.getNewInstanceAddMode()
+                launchFragment(shopItemFragment, "Add")
+            }
         }
     }
 
@@ -64,8 +75,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupShopItemClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            val intent = ShopItemActivity.getNewIntentEditMode(this, it.id)
-            startActivity(intent)
+            if (isPortraitMode()) {
+                val intent = ShopItemActivity.getNewIntentEditMode(this, it.id)
+                startActivity(intent)
+            }
+            else {
+                val shopItemFragment = ShopItemFragment.getNewInstanceEditMode(it.id)
+                launchFragment(shopItemFragment, "Edit")
+            }
         }
     }
 
@@ -90,5 +107,22 @@ class MainActivity : AppCompatActivity() {
 
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(shopListRecyclerView)
+    }
+
+    private fun isPortraitMode(): Boolean {
+        return shopItemContainer == null
+    }
+
+    private fun launchFragment(shopItemFragment: ShopItemFragment, name: String) {
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.shop_item_container, shopItemFragment)
+            .addToBackStack(name)
+            .commit()
+    }
+
+    override fun onEditingFinished() {
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+        supportFragmentManager.popBackStack()
     }
 }
