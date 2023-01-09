@@ -1,6 +1,7 @@
 package kz.example.shoppinglist.presentation
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
@@ -9,20 +10,25 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kz.example.shoppinglist.R
+import kz.example.shoppinglist.databinding.ActivityMainBinding
+import kz.example.shoppinglist.presentation.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var viewModel: MainViewModel
-    private lateinit var shopListRecyclerView: RecyclerView
+//    private lateinit var shopListRecyclerView: RecyclerView
     private lateinit var shopListAdapter: ShopListAdapter
 
-    private var shopItemContainer: FragmentContainerView? = null
+//    private var shopItemContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        shopItemContainer = findViewById(R.id.shop_item_container)
+//        shopItemContainer = findViewById(R.id.shop_item_container)
 
         setupRecyclerView()
 
@@ -31,8 +37,8 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
             shopListAdapter.submitList(it)
         }
 
-        val floatAddItemButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
-        floatAddItemButton.setOnClickListener {
+//        val floatAddItemButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        binding.buttonAddShopItem.setOnClickListener {
             if (isPortraitMode()) {
                 val intent = ShopItemActivity.getNewIntentAddMode(this)
                 startActivity(intent)
@@ -45,9 +51,9 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     }
 
     private fun setupRecyclerView() {
-        shopListRecyclerView = findViewById(R.id.recycler_view_shop_list)
+//        shopListRecyclerView = findViewById(R.id.recycler_view_shop_list)
 
-        with(shopListRecyclerView) {
+        with(binding.recyclerViewShopList) {
             shopListAdapter = ShopListAdapter()
             adapter = shopListAdapter
 
@@ -106,11 +112,11 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         }
 
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(shopListRecyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerViewShopList)
     }
 
     private fun isPortraitMode(): Boolean {
-        return shopItemContainer == null
+        return binding.shopItemContainer == null
     }
 
     private fun launchFragment(shopItemFragment: ShopItemFragment, name: String) {

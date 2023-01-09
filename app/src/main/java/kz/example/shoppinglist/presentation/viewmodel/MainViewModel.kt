@@ -1,4 +1,4 @@
-package kz.example.shoppinglist.presentation
+package kz.example.shoppinglist.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import kz.example.shoppinglist.data.ShopListRepositoryImpl

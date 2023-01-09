@@ -13,7 +13,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import kz.example.shoppinglist.R
+import kz.example.shoppinglist.databinding.FragmentShopItemBinding
 import kz.example.shoppinglist.domain.ShopItem
+import kz.example.shoppinglist.presentation.viewmodel.ShopItemViewModel
 import java.lang.RuntimeException
 
 class ShopItemFragment: Fragment() {
@@ -23,12 +25,17 @@ class ShopItemFragment: Fragment() {
     //initialize on onBind()
     private lateinit var shopItemViewModel: ShopItemViewModel
 
-    //initialize on onBind()
-    private lateinit var textInputLayoutName: TextInputLayout
-    private lateinit var textInputLayoutCount: TextInputLayout
-    private lateinit var editTextName: EditText
-    private lateinit var editTextCount: EditText
-    private lateinit var saveButton: Button
+//    //initialize on onBind()
+//    private lateinit var textInputLayoutName: TextInputLayout
+//    private lateinit var textInputLayoutCount: TextInputLayout
+//    private lateinit var editTextName: EditText
+//    private lateinit var editTextCount: EditText
+//    private lateinit var saveButton: Button
+
+    private var _binding: FragmentShopItemBinding? = null
+    private val binding: FragmentShopItemBinding
+    get() = _binding ?: throw RuntimeException("FragmentShopItemBinding == null")
+
 
     //initialize on
     private var screenMode: String = MODE_UNKNOWN
@@ -43,14 +50,19 @@ class ShopItemFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return  inflater.inflate(R.layout.fragment_shop_item, container, false)
+    ): View {
+        _binding = FragmentShopItemBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        onBind(view)
+//        onBind(view)
+        shopItemViewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
+
+        binding.shopItemViewModel = shopItemViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         launchRightMode()
         errorForTextInputLayout()
@@ -76,8 +88,8 @@ class ShopItemFragment: Fragment() {
     }
 
     private fun launchAddMode() {
-        saveButton.setOnClickListener {
-            shopItemViewModel.addShopItem(editTextName.text?.toString(), editTextCount.text?.toString())
+        binding.saveButton.setOnClickListener {
+            shopItemViewModel.addShopItem(binding.editTextName.text?.toString(), binding.editTextCount.text?.toString())
         }
     }
 
@@ -86,37 +98,37 @@ class ShopItemFragment: Fragment() {
         shopItemViewModel.editShopItem.observe(viewLifecycleOwner) {
             fillEditTextFields(it)
         }
-        saveButton.setOnClickListener {
-            shopItemViewModel.editShopItem(editTextName.text?.toString(), editTextCount.text?.toString())
+        binding.saveButton.setOnClickListener {
+            shopItemViewModel.editShopItem(binding.editTextName.text?.toString(), binding.editTextCount.text?.toString())
         }
     }
 
     private fun fillEditTextFields(shopItem: ShopItem) {
-        editTextName.setText(shopItem.name)
-        editTextCount.setText(shopItem.count.toString())
+        binding.editTextName.setText(shopItem.name)
+        binding.editTextCount.setText(shopItem.count.toString())
     }
 
     private fun errorForTextInputLayout() {
-        shopItemViewModel.errorInputName.observe(viewLifecycleOwner){
-            val errorNameMessage = if(it){
-                getString(R.string.error_input_name)
-            }
-            else {
-                null
-            }
-            textInputLayoutName.error = errorNameMessage
-        }
-        shopItemViewModel.errorInputCount.observe(viewLifecycleOwner) {
-            val errorCountMessage = if(it){
-                getString(R.string.error_input_count)
-            }
-            else {
-                null
-            }
-            textInputLayoutCount.error = errorCountMessage
-        }
+//        shopItemViewModel.errorInputName.observe(viewLifecycleOwner){
+//            val errorNameMessage = if(it){
+//                getString(R.string.error_input_name)
+//            }
+//            else {
+//                null
+//            }
+//            binding.textInputLayoutName.error = errorNameMessage
+//        }
+//        shopItemViewModel.errorInputCount.observe(viewLifecycleOwner) {
+//            val errorCountMessage = if(it){
+//                getString(R.string.error_input_count)
+//            }
+//            else {
+//                null
+//            }
+//            binding.textInputLayoutCount.error = errorCountMessage
+//        }
 
-        editTextName.addTextChangedListener(object : TextWatcher {
+        binding.editTextName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -127,7 +139,7 @@ class ShopItemFragment: Fragment() {
             override fun afterTextChanged(p0: Editable?) {
             }
         })
-        editTextCount.addTextChangedListener(object : TextWatcher {
+        binding.editTextCount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -144,32 +156,32 @@ class ShopItemFragment: Fragment() {
         val args = requireArguments()
 
         if (!args.containsKey(SCREEN_MODE)) {
-            throw java.lang.RuntimeException("Screen mode is absent")
+            throw RuntimeException("Screen mode is absent")
         }
 
         val mode = args.getString(SCREEN_MODE)
         if (mode != MODE_ADD && mode != MODE_EDIT) {
-            throw java.lang.RuntimeException("Unknown screen mode $mode")
+            throw RuntimeException("Unknown screen mode $mode")
         }
 
         screenMode = mode
         if (screenMode == MODE_EDIT) {
             if (!args.containsKey(SHOP_ITEM_ID)) {
-                throw java.lang.RuntimeException("Shop item id is absent")
+                throw RuntimeException("Shop item id is absent")
             }
             shopItemId = args.getInt(SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
         }
     }
 
-    private fun onBind(view: View) {
-        shopItemViewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-
-        textInputLayoutName = view.findViewById(R.id.text_input_layout_name)
-        textInputLayoutCount = view.findViewById(R.id.text_input_layout_count)
-        editTextName = view.findViewById(R.id.edit_text_name)
-        editTextCount = view.findViewById(R.id.edit_text_count)
-        saveButton = view.findViewById(R.id.save_button)
-    }
+//    private fun onBind(view: View) {
+//
+//
+//        textInputLayoutName = view.findViewById(R.id.text_input_layout_name)
+//        textInputLayoutCount = view.findViewById(R.id.text_input_layout_count)
+//        editTextName = view.findViewById(R.id.edit_text_name)
+//        editTextCount = view.findViewById(R.id.edit_text_count)
+//        saveButton = view.findViewById(R.id.save_button)
+//    }
 
     private fun closeScreen() {
         shopItemViewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
@@ -179,7 +191,6 @@ class ShopItemFragment: Fragment() {
 
 
     interface OnEditingFinishedListener {
-
         fun onEditingFinished()
     }
 

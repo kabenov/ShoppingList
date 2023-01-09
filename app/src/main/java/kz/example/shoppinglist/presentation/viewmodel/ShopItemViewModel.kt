@@ -1,4 +1,4 @@
-package kz.example.shoppinglist.presentation
+package kz.example.shoppinglist.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
